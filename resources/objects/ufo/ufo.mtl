@@ -1,0 +1,13 @@
+# Blender 4.1.0 MTL File: 'None'
+# www.blender.org
+
+newmtl UFO
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd UFO_color.jpg
+map_Ns UFO_rough.jpg
+map_refl UFO_metalness.jpg
+map_Ke UFO_emi_2.jpg
