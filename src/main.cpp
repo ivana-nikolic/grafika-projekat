@@ -58,6 +58,21 @@ struct PointLight {
     float quadratic;
 };
 
+struct SpotLight {
+    glm::vec3 position;
+    glm::vec3 direction;
+    float cutOff;
+    float outerCutOff;
+
+    float constant;
+    float linear;
+    float quadratic;
+
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
+};
+
 struct ProgramState {
     glm::vec3 clearColor = glm::vec3(0);
     bool ImGuiEnabled = false;
@@ -67,18 +82,18 @@ struct ProgramState {
     glm::vec3 carPosition = glm::vec3(-20.0f, -10.0f, 13.0f);
     glm::vec3 desertPosition = glm::vec3(0.0f, -2.5f, 0.0f);
     glm::vec3 roadPosition = glm::vec3(0.0f, -9.5f, 3.7f);
-    glm::vec3 UFOPosition = carPosition + glm::vec3(0.0f, 30.0f, 0.0f);
+    glm::vec3 UFOPosition = carPosition + glm::vec3(3.0f, 30.0f, 0.0f);
     glm::vec3 signPosition = glm::vec3(-20.0f, -10.0f, 21.0f);
-
 
     float carScale = 3.0f;
     float desertScale = 130.0f;
-    float roadScale = 0.01f;
+    float roadScale = 1.0f;
     float UFOScale = 6.5f;
     float signScale = 0.1f;
 
-
     PointLight pointLight;
+    SpotLight UFOlight;
+
     ProgramState()
             : camera(glm::vec3(0.0f, 0.0f, 3.0f)) {}
 
@@ -187,7 +202,7 @@ int main() {
     carModel.SetShaderTextureNamePrefix("material.");
     Model desertModel("resources/objects/desert/desert.obj");
     desertModel.SetShaderTextureNamePrefix("material.");
-    Model roadModel("resources/objects/road/Modular_Roads_Pack.obj");
+    Model roadModel("resources/objects/road/road.obj");
     roadModel.SetShaderTextureNamePrefix("material.");
     Model UFOModel("resources/objects/ufo/ufo.obj");
     UFOModel.SetShaderTextureNamePrefix("material.");
@@ -196,13 +211,27 @@ int main() {
 
     PointLight& pointLight = programState->pointLight;
     pointLight.position = glm::vec3(4.0f, 4.0, 0.0);
-    pointLight.ambient = glm::vec3(0.5, 0.5, 0.5);
-    pointLight.diffuse = glm::vec3(0.6, 0.6, 0.6);
+    pointLight.ambient = glm::vec3(0.4, 0.5, 0.4);
+    pointLight.diffuse = glm::vec3(0.4, 0.6, 0.4);
     pointLight.specular = glm::vec3(1.0, 1.0, 1.0);
 
     pointLight.constant = 1.0f;
     pointLight.linear = 0.09f;
     pointLight.quadratic = 0.032f;
+
+    SpotLight& UFOlight = programState->UFOlight;
+    UFOlight.position = glm::vec3(4.0f, 4.0, 0.0);
+    UFOlight.direction = glm::vec3(4.0f, 1.0f, 0.0f);
+    UFOlight.cutOff = glm::cos(glm::radians(17.5f));
+    UFOlight.outerCutOff = glm::cos(glm::radians(23.5f));
+
+    UFOlight.ambient = glm::vec3(1.0, 5.0, 1.0);
+    UFOlight.diffuse = glm::vec3(3.0, 5.0, 3.0);
+    UFOlight.specular = glm::vec3(3.0, 5.0, 3.0);
+
+    UFOlight.constant = 1.0f;
+    UFOlight.linear = 0.09f;
+    UFOlight.quadratic = 0.032f;
 
     // draw in wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -229,6 +258,7 @@ int main() {
         ourShader.use();
 //        pointLight.position = glm::vec3(4.0 * cos(currentFrame), 20.0f, 4.0 * sin(currentFrame));
         pointLight.position = programState->carPosition + glm::vec3(0.0, 12.0f, 0.0);
+        UFOlight.position = glm::vec3(4.0f, 4.0, 0.0);
 
 
         ourShader.setVec3("pointLight.position", pointLight.position);
@@ -240,9 +270,21 @@ int main() {
         ourShader.setFloat("pointLight.quadratic", pointLight.quadratic);
         ourShader.setVec3("viewPosition", programState->camera.Position);
         ourShader.setFloat("material.shininess", 32.0f);
+
+        ourShader.setVec3("spotLight.position", programState->UFOPosition);
+        ourShader.setVec3("spotLight.direction", glm::vec3(0.0f, -1.0f, 0.0f));
+        ourShader.setVec3("spotLight.ambient", UFOlight.ambient);
+        ourShader.setVec3("spotLight.diffuse", UFOlight.diffuse);
+        ourShader.setVec3("spotLight.specular", UFOlight.specular);
+        ourShader.setFloat("spotLight.constant", UFOlight.constant);
+        ourShader.setFloat("spotLight.linear", UFOlight.linear);
+        ourShader.setFloat("spotLight.quadratic", UFOlight.quadratic);
+        ourShader.setFloat("spotLight.cutOff", UFOlight.cutOff);
+        ourShader.setFloat("spotLight.outerCutOff", UFOlight.outerCutOff);
+
         // view/projection transformations
         glm::mat4 projection = glm::perspective(glm::radians(programState->camera.Zoom),
-                                                (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f, 100.0f);
+                                                (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f, 200.0f);
         glm::mat4 view = programState->camera.GetViewMatrix();
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);

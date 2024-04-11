@@ -1,0 +1,22 @@
+# Blender 4.1.0 MTL File: 'None'
+# www.blender.org
+
+newmtl Road_1X_StraightSG
+Ns 18.000004
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd City_Road_Sidewalk.jpg
+
+newmtl Road_L_IntersectionSG
+Ns 18.000004
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd Road_Intersection.jpg
