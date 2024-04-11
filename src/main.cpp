@@ -71,6 +71,14 @@ struct SpotLight {
     glm::vec3 specular;
 };
 
+struct DirLight {
+    glm::vec3 direction;
+
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
+};
+
 struct ProgramState {
     glm::vec3 clearColor = glm::vec3(0);
     bool ImGuiEnabled = false;
@@ -91,6 +99,7 @@ struct ProgramState {
 
     PointLight pointLight;
     SpotLight UFOlight;
+    DirLight moonLight;
 
     ProgramState()
             : camera(glm::vec3(0.0f, 0.0f, 3.0f)) {}
@@ -215,7 +224,6 @@ int main() {
     pointLight.ambient = glm::vec3(0.4, 0.5, 0.4);
     pointLight.diffuse = glm::vec3(0.4, 0.6, 0.4);
     pointLight.specular = glm::vec3(1.0, 1.0, 1.0);
-
     pointLight.constant = 1.0f;
     pointLight.linear = 0.09f;
     pointLight.quadratic = 0.032f;
@@ -225,14 +233,18 @@ int main() {
     UFOlight.direction = glm::vec3(4.0f, 1.0f, 0.0f);
     UFOlight.cutOff = glm::cos(glm::radians(17.5f));
     UFOlight.outerCutOff = glm::cos(glm::radians(23.5f));
-
     UFOlight.ambient = glm::vec3(1.0, 5.0, 1.0);
     UFOlight.diffuse = glm::vec3(3.0, 5.0, 3.0);
     UFOlight.specular = glm::vec3(3.0, 5.0, 3.0);
-
     UFOlight.constant = 1.0f;
     UFOlight.linear = 0.09f;
     UFOlight.quadratic = 0.032f;
+
+    DirLight& moonLight = programState->moonLight;
+    moonLight.direction = glm::vec3(0.0f, 1.0f, 0.0f);
+    moonLight.specular = glm::vec3(0.1f, 0.1f, 0.1f);
+    moonLight.ambient = glm::vec3(0.1f, 0.1f, 0.1f);
+    moonLight.diffuse = glm::vec3(0.1f, 0.1f, 0.1f);
 
     // draw in wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -283,6 +295,11 @@ int main() {
         ourShader.setFloat("spotLight.quadratic", UFOlight.quadratic);
         ourShader.setFloat("spotLight.cutOff", UFOlight.cutOff);
         ourShader.setFloat("spotLight.outerCutOff", UFOlight.outerCutOff);
+
+        ourShader.setVec3("dirLight.direction", moonLight.direction);
+        ourShader.setVec3("dirLight.ambient", moonLight.ambient);
+        ourShader.setVec3("dirLight.diffuse", moonLight.diffuse);
+        ourShader.setVec3("dirLight.specular", moonLight.specular);
 
         // view/projection transformations
         glm::mat4 projection = glm::perspective(glm::radians(programState->camera.Zoom),
