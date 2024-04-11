@@ -32,13 +32,11 @@ void drawRoad(Shader ourShader, Model ourModel);
 void drawUFO(Shader ourShader, Model ourModel);
 void drawSign(Shader ourShader, Model ourModel);
 
-
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 // camera
-
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -191,6 +189,9 @@ int main() {
     // configure global opengl state
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_CULL_FACE);
 
     // build and compile shaders
     // -------------------------
@@ -256,6 +257,7 @@ int main() {
 
         // don't forget to enable shader before setting uniforms
         ourShader.use();
+
 //        pointLight.position = glm::vec3(4.0 * cos(currentFrame), 20.0f, 4.0 * sin(currentFrame));
         pointLight.position = programState->carPosition + glm::vec3(0.0, 12.0f, 0.0);
         UFOlight.position = glm::vec3(4.0f, 4.0, 0.0);
