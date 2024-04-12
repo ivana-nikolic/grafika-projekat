@@ -87,14 +87,7 @@ struct ProgramState {
     Camera camera;
     bool CameraMouseMovementUpdateEnabled = true;
 
-//    glm::vec3 carPosition = glm::vec3(-20.0f, -10.0f, 13.0f);
-//    glm::vec3 desertPosition = glm::vec3(0.0f, -2.5f, 0.0f);
-//    glm::vec3 roadPosition = glm::vec3(0.0f, -9.5f, 3.7f);
-//
-//    glm::vec3 UFOPosition = carPosition + glm::vec3(3.0f, 30.0f, 0.0f);
-//    glm::vec3 signPosition = glm::vec3(-20.0f, -10.0f, 21.0f);
-
-    glm::vec3 carPosition = glm::vec3(-190.0f, -10.0f, 13.0f);
+    glm::vec3 carPosition = glm::vec3(-190.0f, -2.0f, 13.0f);
     glm::vec3 desertPosition = glm::vec3(-170.0f, -2.5f, 0.0f);
     glm::vec3 roadPosition = glm::vec3(-170.0f, -9.5f, 3.7f);
 
