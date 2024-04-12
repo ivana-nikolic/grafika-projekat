@@ -1,8 +1,9 @@
 Projekat za predmet Racunarska grafika (MATF).
 
 - Kretanje: WASD
-
 - Toggle za pomeranje misa: M
+- Kliknuti F1 da prozor "proguta" cursor radi lakseg kretanja kamere
+- Izlaz iz programa: ESC
 
 Implementirano: 1-7. nedelja, blending, face culling, Blinn-Phong osvetljenje, model, skybox iz grupe A.
 
