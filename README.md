@@ -11,8 +11,6 @@ Resursi preuzeti sa:
 - skybox: artstation.com 
 - modeli + teksture: 3dexport.com, free3d.com
 
-<img width="720" alt="Screenshot 2024-04-12 at 11 21 11" src="https://github.com/ivana-nikolic/grafika-projekat/assets/122492916/ff8ae418-64e1-4e52-ab11-7797c5a4d7ca">
+<img width="720" alt="Screenshot 2024-04-12 at 11 25 02" src="https://github.com/ivana-nikolic/grafika-projekat/assets/122492916/339a60e4-0b8d-45e3-8897-bc00cf3fabb6">
 
-
-
-
+<img width="720" alt="Screenshot 2024-04-12 at 11 25 23" src="https://github.com/ivana-nikolic/grafika-projekat/assets/122492916/bdce76fb-89ac-4c77-a1c0-565fa265af7c">
