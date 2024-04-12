@@ -530,13 +530,6 @@ void DrawImGui(ProgramState *programState) {
     ImGui::NewFrame();
 
 
-    {
-        static float f = 0.0f;
-        ImGui::Begin("Hello window");
-        ImGui::Text("Hello text");
-        ImGui::ColorEdit3("Background color", (float *) &programState->clearColor);
-        ImGui::End();
-    }
 
     {
         ImGui::Begin("Camera info");
