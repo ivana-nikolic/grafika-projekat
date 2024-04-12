@@ -32,6 +32,7 @@ void drawRoad(Shader ourShader, Model ourModel);
 void drawUFO(Shader ourShader, Model ourModel);
 void drawSign(Shader ourShader, Model ourModel);
 unsigned int loadCubemap(vector<std::string> faces);
+unsigned int loadTexture(char const * path);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -86,12 +87,19 @@ struct ProgramState {
     Camera camera;
     bool CameraMouseMovementUpdateEnabled = true;
 
-    glm::vec3 carPosition = glm::vec3(-20.0f, -10.0f, 13.0f);
-    glm::vec3 desertPosition = glm::vec3(0.0f, -2.5f, 0.0f);
-    glm::vec3 roadPosition = glm::vec3(0.0f, -9.5f, 3.7f);
+//    glm::vec3 carPosition = glm::vec3(-20.0f, -10.0f, 13.0f);
+//    glm::vec3 desertPosition = glm::vec3(0.0f, -2.5f, 0.0f);
+//    glm::vec3 roadPosition = glm::vec3(0.0f, -9.5f, 3.7f);
+//
+//    glm::vec3 UFOPosition = carPosition + glm::vec3(3.0f, 30.0f, 0.0f);
+//    glm::vec3 signPosition = glm::vec3(-20.0f, -10.0f, 21.0f);
+
+    glm::vec3 carPosition = glm::vec3(-190.0f, -10.0f, 13.0f);
+    glm::vec3 desertPosition = glm::vec3(-170.0f, -2.5f, 0.0f);
+    glm::vec3 roadPosition = glm::vec3(-170.0f, -9.5f, 3.7f);
 
     glm::vec3 UFOPosition = carPosition + glm::vec3(3.0f, 30.0f, 0.0f);
-    glm::vec3 signPosition = glm::vec3(-20.0f, -10.0f, 21.0f);
+    glm::vec3 signPosition = glm::vec3(-190.0f, -10.0f, 21.0f);
 
     float carScale = 3.0f;
     float desertScale = 130.0f;
@@ -180,9 +188,6 @@ int main() {
         return -1;
     }
 
-    // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
-    //stbi_set_flip_vertically_on_load(true);
-
     programState = new ProgramState;
     programState->LoadFromFile("resources/program_state.txt");
     if (programState->ImGuiEnabled) {
@@ -208,6 +213,7 @@ int main() {
     // -------------------------
     Shader ourShader("resources/shaders/2.model_lighting.vs", "resources/shaders/2.model_lighting.fs");
     Shader skyboxShader("resources/shaders/skybox.vs", "resources/shaders/skybox.fs");
+    Shader blendingShader("resources/shaders/blending.vs", "resources/shaders/blending.fs");
 
     float skyboxVertices[] = {
             // positions
@@ -275,8 +281,41 @@ int main() {
             };
     unsigned int cubemapTexture = loadCubemap(faces);
 
+    blendingShader.use();
+
+    float transparentVertices[] = {
+            // positions         // texture Coords (swapped y coordinates because texture is flipped upside down)
+            0.0f,  0.5f,  0.0f,  0.0f,  0.0f,
+            0.0f, -0.5f,  0.0f,  0.0f,  1.0f,
+            1.0f, -0.5f,  0.0f,  1.0f,  1.0f,
+
+            0.0f,  0.5f,  0.0f,  0.0f,  0.0f,
+            1.0f, -0.5f,  0.0f,  1.0f,  1.0f,
+            1.0f,  0.5f,  0.0f,  1.0f,  0.0f
+    };
+
+    // transparent VAO
+    unsigned int transparentVAO, transparentVBO;
+    glGenVertexArrays(1, &transparentVAO);
+    glGenBuffers(1, &transparentVBO);
+    glBindVertexArray(transparentVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, transparentVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(transparentVertices), transparentVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glBindVertexArray(0);
+
+    unsigned int transparentTexture = loadTexture(FileSystem::getPath("resources/textures/cactus.png").c_str());
+
+    // transparent vegetation locations
+    // --------------------------------
+    glm::vec3 vegetation = glm::vec3(-190.0f, -2.0f, -5.0f);
+
     ourShader.use();
     skyboxShader.use();
+
 
     // load models
     // -----------
@@ -318,9 +357,6 @@ int main() {
     moonLight.ambient = glm::vec3(0.1f, 0.1f, 0.1f);
     moonLight.diffuse = glm::vec3(0.1f, 0.1f, 0.1f);
 
-    // draw in wireframe
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window)) {
@@ -342,7 +378,6 @@ int main() {
         // don't forget to enable shader before setting uniforms
         ourShader.use();
 
-//        pointLight.position = glm::vec3(4.0 * cos(currentFrame), 20.0f, 4.0 * sin(currentFrame));
         pointLight.position = programState->carPosition + glm::vec3(0.0, 12.0f, 0.0);
         UFOlight.position = glm::vec3(4.0f, 4.0, 0.0);
 
@@ -377,6 +412,7 @@ int main() {
         glm::mat4 projection = glm::perspective(glm::radians(programState->camera.Zoom),
                                                 (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f, 200.0f);
         glm::mat4 view = programState->camera.GetViewMatrix();
+        glm::mat4 model = glm::mat4(1.0f);
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
 
@@ -387,6 +423,17 @@ int main() {
         drawRoad(ourShader, roadModel);
         drawUFO(ourShader, UFOModel);
         drawSign(ourShader, signModel);
+
+        // vegetation
+        blendingShader.use();
+        blendingShader.setMat4("projection", projection);
+        blendingShader.setMat4("view", view);
+        glBindVertexArray(transparentVAO);
+        glBindTexture(GL_TEXTURE_2D, transparentTexture);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, vegetation);
+        blendingShader.setMat4("model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // draw skybox as last
         glDepthMask(GL_FALSE);
@@ -487,14 +534,7 @@ void DrawImGui(ProgramState *programState) {
         static float f = 0.0f;
         ImGui::Begin("Hello window");
         ImGui::Text("Hello text");
-//        ImGui::SliderFloat("Float slider", &f, 0.0, 1.0);
         ImGui::ColorEdit3("Background color", (float *) &programState->clearColor);
-//        ImGui::DragFloat3("Car position", (float*)&programState->carPosition);
-//        ImGui::DragFloat("Car scale", &programState->carScale, 0.05, 0.1, 4.0);
-
-//        ImGui::DragFloat("pointLight.constant", &programState->pointLight.constant, 0.05, 0.0, 1.0);
-//        ImGui::DragFloat("pointLight.linear", &programState->pointLight.linear, 0.05, 0.0, 1.0);
-//        ImGui::DragFloat("pointLight.quadratic", &programState->pointLight.quadratic, 0.05, 0.0, 1.0);
         ImGui::End();
     }
 
@@ -502,7 +542,6 @@ void DrawImGui(ProgramState *programState) {
         ImGui::Begin("Camera info");
         const Camera& c = programState->camera;
         ImGui::Text("Camera position: (%f, %f, %f)", c.Position.x, c.Position.y, c.Position.z);
-//        ImGui::Text("(Yaw, Pitch): (%f, %f)", c.Yaw, c.Pitch);
         ImGui::Text("Camera front: (%f, %f, %f)", c.Front.x, c.Front.y, c.Front.z);
         ImGui::Checkbox("Camera mouse update", &programState->CameraMouseMovementUpdateEnabled);
         ImGui::End();
@@ -591,6 +630,43 @@ unsigned int loadCubemap(vector<std::string> faces)
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    return textureID;
+}
+
+unsigned int loadTexture(char const * path)
+{
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+
+    int width, height, nrComponents;
+    unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
+    if (data)
+    {
+        GLenum format;
+        if (nrComponents == 1)
+            format = GL_RED;
+        else if (nrComponents == 3)
+            format = GL_RGB;
+        else if (nrComponents == 4)
+            format = GL_RGBA;
+
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, format == GL_RGBA ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, format == GL_RGBA ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        stbi_image_free(data);
+    }
+    else
+    {
+        std::cout << "Texture failed to load at path: " << path << std::endl;
+        stbi_image_free(data);
+    }
 
     return textureID;
 }
