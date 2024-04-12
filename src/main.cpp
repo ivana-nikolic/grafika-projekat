@@ -285,13 +285,13 @@ int main() {
 
     float transparentVertices[] = {
             // positions         // texture Coords (swapped y coordinates because texture is flipped upside down)
-            0.0f,  0.5f,  0.0f,  0.0f,  0.0f,
-            0.0f, -0.5f,  0.0f,  0.0f,  1.0f,
-            1.0f, -0.5f,  0.0f,  1.0f,  1.0f,
+            0.0f,  5.0f,  0.0f,  0.0f,  0.0f,
+            0.0f, -5.0f,  0.0f,  0.0f,  1.0f,
+            10.0f, -5.0f,  0.0f,  1.0f,  1.0f,
 
-            0.0f,  0.5f,  0.0f,  0.0f,  0.0f,
-            1.0f, -0.5f,  0.0f,  1.0f,  1.0f,
-            1.0f,  0.5f,  0.0f,  1.0f,  0.0f
+            0.0f,  5.0f,  0.0f,  0.0f,  0.0f,
+            10.0f, -5.0f,  0.0f,  1.0f,  1.0f,
+            10.0f,  5.0f,  0.0f,  1.0f,  0.0f
     };
 
     // transparent VAO
@@ -309,9 +309,9 @@ int main() {
 
     unsigned int transparentTexture = loadTexture(FileSystem::getPath("resources/textures/cactus.png").c_str());
 
-    // transparent vegetation locations
+    // transparent vegetation location
     // --------------------------------
-    glm::vec3 vegetation = glm::vec3(-190.0f, -2.0f, -5.0f);
+    glm::vec3 vegetation = glm::vec3(-192.0f, -4.5f, 1.7f);
 
     ourShader.use();
     skyboxShader.use();
@@ -344,9 +344,9 @@ int main() {
     UFOlight.direction = glm::vec3(4.0f, 1.0f, 0.0f);
     UFOlight.cutOff = glm::cos(glm::radians(17.5f));
     UFOlight.outerCutOff = glm::cos(glm::radians(23.5f));
-    UFOlight.ambient = glm::vec3(1.0, 5.0, 1.0);
-    UFOlight.diffuse = glm::vec3(3.0, 5.0, 3.0);
-    UFOlight.specular = glm::vec3(3.0, 5.0, 3.0);
+    UFOlight.ambient = glm::vec3(2.5, 5.0, 1.0);
+    UFOlight.diffuse = glm::vec3(4.5, 5.0, 1.5);
+    UFOlight.specular = glm::vec3(4.5, 5.0, 1.5);
     UFOlight.constant = 1.0f;
     UFOlight.linear = 0.09f;
     UFOlight.quadratic = 0.032f;
